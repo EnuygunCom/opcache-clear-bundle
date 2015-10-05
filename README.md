@@ -54,6 +54,12 @@ Add this bundle to your application kernel:
         );
     }
     
+Add following to your routing.yml:
+
+    enuyguncom_opcache_clear:
+        resource: "@EnuygunComOpcacheClearBundle/Controller/"
+        type:     annotation
+        prefix:   /
     
 
 

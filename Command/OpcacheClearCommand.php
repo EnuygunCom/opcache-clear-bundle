@@ -44,7 +44,7 @@ class OpcacheClearCommand extends ContainerAwareCommand
             throw new \InvalidArgumentException(sprintf('Web dir is not writable "%s"', $webDir));
         }
 
-        $url = sprintf('%s://%s%s', $protocol, $hostIp, $this->getContainer()->get('router')->generate('enuygun_com_opcache_clear', array('version' => $version), false));
+        $url = sprintf('%s://%s%s', $protocol, $hostIp, $this->getContainer()->get('router')->generate('_enuygun_com_opcache_clear', array('version' => $version), false));
 
         $checkUrlCount = 0;
         $checkMaxUrl = 10;

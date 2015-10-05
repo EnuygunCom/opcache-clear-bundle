@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 class OpcacheClearController extends Controller
 {
     /**
-     * @Route("/opcache-clear/{version}/", name="enuygun_com_opcache_clear")
+     * @Route("/opcache-clear/{version}/", name="_enuygun_com_opcache_clear")
      * @param Request $request
      * @param $version
      * @return array
