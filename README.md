@@ -39,7 +39,7 @@ Now you need to add the following configuration into config.yml file
         web_dir:    %kernel.root_dir%/../web
         protocol:   http
         app_version:    v1.0.0
-
+        ip_filter: [ 127.0.0.1 ] # a list of ip addresses, may be your static local IP
 
 
 Add this bundle to your application kernel:
