@@ -1,0 +1,32 @@
+{
+    "name" : "enuyguncom/opcache-clear-bundle",
+    "description" : "Enuygun.Com OpcacheClearBundle",
+    "homepage": "http://www.enuygun.com",
+    "type" : "symfony-bundle",
+    "authors" : [{
+        "name" : "Behçet Mutlu",
+        "email" : "behcet.mutlu@enuygun.com"
+    }],
+    "keywords" : [
+        "OpcacheClear Bundle"
+    ],
+    "license" : [
+        "MIT"
+    ],
+    "require" : {
+        "php": ">=5.3.3",
+        "symfony/symfony": ">=2.1.0"
+    },
+    "autoload" : {
+        "psr-0" : {
+            "EnuygunCom\\OpcacheClearBundle" : ""
+        }
+    },
+    "target-dir" : "EnuygunCom/OpcacheClearBundle",
+    "minimum-stability": "dev",
+    "extra" : {
+        "branch-alias" : {
+            "dev-master" : "0.0-dev"
+        }
+    }
+}
