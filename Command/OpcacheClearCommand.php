@@ -50,8 +50,43 @@ class OpcacheClearCommand extends ContainerAwareCommand
         $checkMaxUrl = 10;
 
         do {
-            $headers = $this->mapHeaders(get_headers($url));
-            // TODO integrate Curl version here, because this version requires hosts file definition of which might cause internal problems
+            $output->writeln(sprintf('URL: <info>%s</info>', $url));
+
+            $curl_options = array(
+                CURLOPT_URL             => $url,
+                CURLOPT_RETURNTRANSFER  => true,
+                CURLOPT_VERBOSE         => true,
+                CURLOPT_FAILONERROR     => true,
+                CURLOPT_HTTPHEADER      => [ sprintf('Host: %s', $hostName) ],
+                CURLOPT_HEADER          => true,
+                CURLOPT_SSL_VERIFYPEER  => false,
+                CURLOPT_SSL_VERIFYHOST  => false
+            );
+
+            $ch = curl_init();
+            curl_setopt_array($ch, $curl_options);
+
+            $result = curl_exec($ch);
+
+            // Then, after your curl_exec call:
+            $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            $header = substr($result, 0, $header_size);
+            $body = substr($result, $header_size);
+
+            $output->writeln(sprintf('Header: <info>%s</info>', $header));
+
+            if (curl_errno($ch)) {
+                $error = curl_error($ch);
+                curl_close($ch);
+
+                throw new \RuntimeException(sprintf('Curl error reading "%s": %s', $url, $error));
+            }
+
+            curl_close($ch);
+
+            $result = json_decode($body, true);
+
+            $headers = $this->mapHeader($header);
 
             $response = isset($headers['x-enuygun-opcache-clear']) ? json_decode($headers['x-enuygun-opcache-clear'], true) : false;
             $appVersion = isset($headers['x-enuygun-app-version']) ? $headers['x-enuygun-app-version'] : null;
@@ -88,5 +123,10 @@ class OpcacheClearCommand extends ContainerAwareCommand
             }
         }
         return $headers;
+    }
+
+    private function mapHeader($headerStr)
+    {
+        return $this->mapHeaders(explode(PHP_EOL, $headerStr));
     }
 }

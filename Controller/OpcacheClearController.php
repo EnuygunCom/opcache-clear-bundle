@@ -19,7 +19,7 @@ class OpcacheClearController extends Controller
      */
     public function opcacheClearAction(Request $request, $version)
     {
-        $ipFilter  = $this->controller->getParameter('enuygun_com_opcache_clear.ip_filter');
+        $ipFilter  = $this->container->getParameter('enuygun_com_opcache_clear.ip_filter');
         if( ! empty($ipFilter) && ! in_array($request->getClientIp(), $ipFilter))
             return new JsonResponse(array('success' => false, 'message' => $request->getClientIp() . ' is not allowed'), 400, array('x-enuygun-opcache-clear' => json_encode(array('success' => false, 'message' => $request->getClientIp() . ' is not allowed', 'version' => $version))));
 
