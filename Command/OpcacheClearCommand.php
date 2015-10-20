@@ -55,7 +55,7 @@ class OpcacheClearCommand extends ContainerAwareCommand
             $curl_options = array(
                 CURLOPT_URL             => $url,
                 CURLOPT_RETURNTRANSFER  => true,
-                CURLOPT_VERBOSE         => true,
+                CURLOPT_VERBOSE         => false,
                 CURLOPT_FAILONERROR     => true,
                 CURLOPT_HTTPHEADER      => [ sprintf('Host: %s', $hostName) ],
                 CURLOPT_HEADER          => true,
@@ -73,7 +73,7 @@ class OpcacheClearCommand extends ContainerAwareCommand
             $header = substr($result, 0, $header_size);
             $body = substr($result, $header_size);
 
-            $output->writeln(sprintf('Header: <info>%s</info>', $header));
+            // $output->writeln(sprintf('Header: <info>%s</info>', $header));
 
             if (curl_errno($ch)) {
                 $error = curl_error($ch);
@@ -99,12 +99,14 @@ class OpcacheClearCommand extends ContainerAwareCommand
             $cleared = isset($response['success']) && $response['success'] === true && $versionChecked;
             $message = isset($response['message']) ? $response['message'] : 'no response';
 
-            $output->writeln(sprintf('<pre>%s</pre>', json_encode(compact('version', 'versionChecked', 'checkUrlCount', 'checkMaxUrl', 'cleared'))));
+            $output->writeln(sprintf('<comment>%s</comment>', json_encode(compact('version', 'appVersion', 'versionChecked', 'checkUrlCount', 'checkMaxUrl', 'cleared'))));
 
         } while(++$checkUrlCount < $checkMaxUrl && ! $cleared);
 
         if($cleared) {
             $output->writeln(sprintf('<info>Opcache cleared after # of %d trials. [x-enuygun-app-version: %s]</info>', $checkUrlCount, $appVersion));
+        } elseif($versionChecked) {
+            $output->writeln(sprintf('<info>Opcache clear failed but version is up to date after # of %d trials. [x-enuygun-app-version: %s]</info>', $checkUrlCount, $appVersion));
         } else {
             throw new \RuntimeException(sprintf('<error>Opcache is NOT cleared after # of %d trials. Response message was: %s [x-enuygun-app-version: %s]</error>', $checkUrlCount, $message, $appVersion));
         }
