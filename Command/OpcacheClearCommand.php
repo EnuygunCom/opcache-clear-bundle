@@ -35,6 +35,7 @@ class OpcacheClearCommand extends ContainerAwareCommand
         $version   = $input->getOption('app_version')
             ? $input->getOption('app_version')
             : $this->getContainer()->getParameter('enuygun_com_opcache_clear.app_version');
+        $verbose = $input->getOption('verbose');
 
         if (!is_dir($webDir)) {
             throw new \InvalidArgumentException(sprintf('Web dir does not exist "%s"', $webDir));
@@ -73,7 +74,8 @@ class OpcacheClearCommand extends ContainerAwareCommand
             $header = substr($result, 0, $header_size);
             $body = substr($result, $header_size);
 
-            // $output->writeln(sprintf('Header: <info>%s</info>', $header));
+            if($verbose)
+                $output->writeln(sprintf('Header: <info>%s</info>', $header));
 
             if (curl_errno($ch)) {
                 $error = curl_error($ch);
@@ -99,7 +101,8 @@ class OpcacheClearCommand extends ContainerAwareCommand
             $cleared = isset($response['success']) && $response['success'] === true && $versionChecked;
             $message = isset($response['message']) ? $response['message'] : 'no response';
 
-            $output->writeln(sprintf('<comment>%s</comment>', json_encode(compact('version', 'appVersion', 'versionChecked', 'checkUrlCount', 'checkMaxUrl', 'cleared'))));
+            if($verbose)
+                $output->writeln(sprintf('<comment>%s</comment>', json_encode(compact('version', 'appVersion', 'versionChecked', 'checkUrlCount', 'checkMaxUrl', 'cleared'))));
 
         } while(++$checkUrlCount < $checkMaxUrl && ! $cleared);
 
