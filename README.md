@@ -61,6 +61,17 @@ Add following to your routing.yml:
         type:     annotation
         prefix:   /
     
+    
+Add following to your app.php between these two lines:
+
+    
+    $response = $kernel->handle($request);
+    ...
+        $appVersion = 'v1.0.0';
+        $response->headers->set('x-enuygun-app-version', $appVersion);
+    ...
+    $response->send();
+    
 
 
 On your deploy.rb add the following:
