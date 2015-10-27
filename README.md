@@ -72,11 +72,11 @@ On your deploy.rb add the following:
         desc "Clear opcache cache"
         task :clear_opcache do
             capifony_pretty_print "--> Clear opcache cache by enuygun"
-            run "#{try_sudo} sh -c 'cd #{latest_release} && #{php_bin} #{symfony_console} enuygun:opcache:clear --app_version=#{real_revision[0..6]} --env=#{symfony_env_prod}'"
+            run "#{try_sudo} sh -c 'cd #{latest_release} && #{php_bin} #{symfony_console} enuygun:opcache:clear --app_version=#{real_revision[0..6]}#{latest_release[-4..-1]} --env=#{symfony_env_prod}'"
             capifony_puts_ok
         end
         task :change_version, :roles => :app do
-            run "sed -i 's/\\(appVersion = \\)\\(.*'\\''\\)\\(.*\\)$/\\1'\\''#{real_revision[0..6]}'\\''\\3/g' #{latest_release}/web/app.php"
+            run "sed -i 's/\\(appVersion = \\)\\(.*'\\''\\)\\(.*\\)$/\\1'\\''#{real_revision[0..6]}#{latest_release[-4..-1]}'\\''\\3/g' #{latest_release}/web/app.php"
             capifony_pretty_print "--> Version updated"
         end
     end
@@ -85,7 +85,7 @@ On your deploy/qa.rb add the following:
 
     namespace :enuygun do
         task :change_version, :roles => :app do
-            run "sed -i 's/\\(appVersion = \\)\\(.*'\\''\\)\\(.*\\)$/\\1'\\''#{real_revision[0..6]}'\\''\\3/g' #{latest_release}/web/app_prod_test.php"
+            run "sed -i 's/\\(appVersion = \\)\\(.*'\\''\\)\\(.*\\)$/\\1'\\''#{real_revision[0..6]}#{latest_release[-4..-1]}'\\''\\3/g' #{latest_release}/web/app_prod_test.php"
             capifony_pretty_print "--> Version updated"
         end
     end
