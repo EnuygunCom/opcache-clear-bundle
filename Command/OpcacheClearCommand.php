@@ -51,6 +51,7 @@ class OpcacheClearCommand extends ContainerAwareCommand
         $checkMaxUrl = 10;
 
         do {
+            sleep($checkMaxUrl * 2);
             if($verbose)
                 $output->writeln(sprintf('URL: <info>%s</info>', $url));
 
