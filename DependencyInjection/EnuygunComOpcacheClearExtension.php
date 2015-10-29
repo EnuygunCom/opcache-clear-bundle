@@ -28,5 +28,6 @@ class EnuygunComOpcacheClearExtension extends Extension
         $container->setParameter('enuygun_com_opcache_clear.protocol', $config['protocol']);
         $container->setParameter('enuygun_com_opcache_clear.ip_filter', $config['ip_filter']);
         $container->setParameter('enuygun_com_opcache_clear.app_version', $config['app_version']);
+        $container->setParameter('enuygun_com_opcache_clear.app_key', $config['app_key']);
     }
 }

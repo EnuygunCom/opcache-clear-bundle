@@ -36,6 +36,7 @@ class OpcacheClearCommand extends ContainerAwareCommand
             ? $input->getOption('app_version')
             : $this->getContainer()->getParameter('enuygun_com_opcache_clear.app_version');
         $verbose = $input->getOption('verbose');
+        $appKey  = $this->getContainer()->getParameter('enuygun_com_opcache_clear.app_key');
 
         if (!is_dir($webDir)) {
             throw new \InvalidArgumentException(sprintf('Web dir does not exist "%s"', $webDir));
@@ -93,7 +94,7 @@ class OpcacheClearCommand extends ContainerAwareCommand
             $headers = $this->mapHeader($header);
 
             $response = isset($headers['x-enuygun-opcache-clear']) ? json_decode($headers['x-enuygun-opcache-clear'], true) : false;
-            $appVersion = isset($headers['x-enuygun-app-version']) ? $headers['x-enuygun-app-version'] : null;
+            $appVersion = isset($headers[$appKey]) ? $headers[$appKey] : null;
             $versionChecked = $appVersion == $version;
 
             if (! $response) {

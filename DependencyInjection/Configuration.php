@@ -28,6 +28,7 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('host_name')->isRequired()->end()
             ->scalarNode('web_dir')->isRequired()->end()
             ->scalarNode('app_version')->isRequired()->end()
+            ->scalarNode('app_key')->defaultValue('x-enuygun-app-version')->end()
             ->enumNode('protocol')->values(array('http', 'https'))->defaultValue('http')->end()
             ->variableNode('ip_filter')->end()
             ->end()
