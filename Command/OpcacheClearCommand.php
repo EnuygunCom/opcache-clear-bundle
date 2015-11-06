@@ -52,7 +52,7 @@ class OpcacheClearCommand extends ContainerAwareCommand
         $checkMaxUrl = 10;
 
         do {
-            sleep($checkMaxUrl * 2);
+            sleep($checkUrlCount * 2);
             if($verbose)
                 $output->writeln(sprintf('URL: <info>%s</info>', $url));
 
@@ -112,9 +112,9 @@ class OpcacheClearCommand extends ContainerAwareCommand
         if($cleared) {
             $output->writeln(sprintf('<info>Opcache cleared after # of %d trials. [x-enuygun-app-version: %s]</info>', $checkUrlCount, $appVersion));
         } elseif($versionChecked) {
-            $output->writeln(sprintf('<info>Opcache clear failed but version is up to date after # of %d trials. [x-enuygun-app-version: %s]</info>', $checkUrlCount, $appVersion));
+            $output->writeln(sprintf('<info>Opcache clear failed but version is up to date after # of %d trials. [%s: %s]</info>', $checkUrlCount, $appKey, $appVersion));
         } else {
-            throw new \RuntimeException(sprintf('<error>Opcache is NOT cleared after # of %d trials. Response message was: %s [x-enuygun-app-version: %s]</error>', $checkUrlCount, $message, $appVersion));
+            throw new \RuntimeException(sprintf('<error>Opcache is NOT cleared after # of %d trials. Response message was: %s [%s: %s]</error>', $checkUrlCount, $message, $appKey, $appVersion));
         }
     }
 
