@@ -57,6 +57,7 @@ class OpcacheClearCommand extends ContainerAwareCommand
                 $output->writeln(sprintf('URL: <info>%s</info>', $url));
 
             $curl_options = array(
+                CURLOPT_USERAGENT => 'Enuygun Opcache Clear Agent',
                 CURLOPT_URL             => $url,
                 CURLOPT_RETURNTRANSFER  => true,
                 CURLOPT_VERBOSE         => false,
