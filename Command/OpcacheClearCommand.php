@@ -22,21 +22,21 @@ class OpcacheClearCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $webDir     = $this->getContainer()->getParameter('enuygun_com_opcache_clear.web_dir');
-        $hostName   = $input->getOption('host-name')
+        $webDir = $this->getContainer()->getParameter('enuygun_com_opcache_clear.web_dir');
+        $hostName = $input->getOption('host-name')
             ? $input->getOption('host-name')
             : $this->getContainer()->getParameter('enuygun_com_opcache_clear.host_name');
-        $hostIp     = $input->getOption('host-ip')
+        $hostIp = $input->getOption('host-ip')
             ? $input->getOption('host-ip')
             : $this->getContainer()->getParameter('enuygun_com_opcache_clear.host_ip');
-        $protocol   = $input->getOption('protocol')
+        $protocol = $input->getOption('protocol')
             ? $input->getOption('protocol')
             : $this->getContainer()->getParameter('enuygun_com_opcache_clear.protocol');
-        $version   = $input->getOption('app_version')
+        $version = $input->getOption('app_version')
             ? $input->getOption('app_version')
             : $this->getContainer()->getParameter('enuygun_com_opcache_clear.app_version');
         $verbose = $input->getOption('verbose');
-        $appKey  = $this->getContainer()->getParameter('enuygun_com_opcache_clear.app_key');
+        $appKey = $this->getContainer()->getParameter('enuygun_com_opcache_clear.app_key');
 
         if (!is_dir($webDir)) {
             throw new \InvalidArgumentException(sprintf('Web dir does not exist "%s"', $webDir));
@@ -53,19 +53,23 @@ class OpcacheClearCommand extends ContainerAwareCommand
 
         do {
             sleep($checkUrlCount * 2);
-            if($verbose)
+            if ($verbose)
                 $output->writeln(sprintf('URL: <info>%s</info>', $url));
+
+            $curlHeaders = [
+                'Host: ' . $hostName
+            ];
 
             $curl_options = array(
                 CURLOPT_USERAGENT => 'Enuygun Opcache Clear Agent',
-                CURLOPT_URL             => $url,
-                CURLOPT_RETURNTRANSFER  => true,
-                CURLOPT_VERBOSE         => false,
-                CURLOPT_FAILONERROR     => true,
-                CURLOPT_HTTPHEADER      => [ sprintf('Host: %s', $hostName) ],
-                CURLOPT_HEADER          => true,
-                CURLOPT_SSL_VERIFYPEER  => false,
-                CURLOPT_SSL_VERIFYHOST  => false
+                CURLOPT_URL => $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_VERBOSE => false,
+                CURLOPT_FAILONERROR => true,
+                CURLOPT_HTTPHEADER => $curlHeaders,
+                CURLOPT_HEADER => true,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => false
             );
 
             $ch = curl_init();
@@ -78,14 +82,15 @@ class OpcacheClearCommand extends ContainerAwareCommand
             $header = substr($result, 0, $header_size);
             $body = substr($result, $header_size);
 
-            if($verbose)
+            if ($verbose)
                 $output->writeln(sprintf('Header: <info>%s</info>', $header));
 
             if (curl_errno($ch)) {
                 $error = curl_error($ch);
                 curl_close($ch);
 
-                throw new \RuntimeException(sprintf('Curl error reading "%s": %s', $url, $error));
+                $output->writeln(sprintf('Curl error reading "%s" headers: [%s], error: %s', $url, json_encode($curlHeaders), $error));
+                exit(0); // exit gracefully
             }
 
             curl_close($ch);
@@ -98,36 +103,37 @@ class OpcacheClearCommand extends ContainerAwareCommand
             $appVersion = isset($headers[$appKey]) ? $headers[$appKey] : null;
             $versionChecked = $appVersion == $version;
 
-            if (! $response) {
-                throw new \RuntimeException(sprintf('The response did not return valid json: %s', $response));
+            if (!$response) {
+                $output->writeln(sprintf('The response did not return valid json: %s', $header));
+                exit(0); // exit gracefully
             }
 
             $cleared = isset($response['success']) && $response['success'] === true && $versionChecked;
             $message = isset($response['message']) ? $response['message'] : 'no response';
 
-            if($verbose)
+            if ($verbose)
                 $output->writeln(sprintf('<comment>%s</comment>', json_encode(compact('version', 'appVersion', 'versionChecked', 'checkUrlCount', 'checkMaxUrl', 'cleared'))));
 
-        } while(++$checkUrlCount < $checkMaxUrl && ! $cleared);
+        } while (++$checkUrlCount < $checkMaxUrl && !$cleared);
 
-        if($cleared) {
+        if ($cleared) {
             $output->writeln(sprintf('<info>Opcache cleared after # of %d trials. [x-enuygun-app-version: %s]</info>', $checkUrlCount, $appVersion));
-        } elseif($versionChecked) {
+        } elseif ($versionChecked) {
             $output->writeln(sprintf('<info>Opcache clear failed but version is up to date after # of %d trials. [%s: %s]</info>', $checkUrlCount, $appKey, $appVersion));
         } else {
-            throw new \RuntimeException(sprintf('<error>Opcache is NOT cleared after # of %d trials. Response message was: %s [%s: %s]</error>', $checkUrlCount, $message, $appKey, $appVersion));
+            $output->writeln(sprintf('<error>Opcache is NOT cleared after # of %d trials. Response message was: %s [%s: %s]</error>', $checkUrlCount, $message, $appKey, $appVersion));
         }
     }
 
     private function mapHeaders($get_headers)
     {
         $headers = array();
-        foreach($get_headers as $header) {
+        foreach ($get_headers as $header) {
             $_keys = explode(':', $header, 2);
 
-            if(sizeof($_keys) > 1) {
+            if (sizeof($_keys) > 1) {
                 $headers[$_keys[0]] = trim($_keys[1]);
-            }else {
+            } else {
                 $headers[] = $_keys[0];
             }
         }
