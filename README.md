@@ -83,7 +83,7 @@ On your deploy.rb add the following:
         desc "Clear opcache cache"
         task :clear_opcache do
             capifony_pretty_print "--> Clear opcache cache by enuygun"
-            run "#{try_sudo} sh -c 'cd #{latest_release} && #{php_bin} #{symfony_console} enuygun:opcache:clear --app_version=#{real_revision[0..6]}#{latest_release[-4..-1]} --env=#{symfony_env_prod}'"
+            run "#{try_sudo} sh -c 'cd #{latest_release} && #{php_bin} #{symfony_console} enuyguncom:opcache:clear --app_version=#{real_revision[0..6]}#{latest_release[-4..-1]} --env=#{symfony_env_prod}'"
             capifony_puts_ok
         end
         task :change_version, :roles => :app do
