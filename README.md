@@ -100,3 +100,17 @@ On your deploy/qa.rb add the following:
             capifony_pretty_print "--> Version updated"
         end
     end
+    
+    
+## Setup Profiler
+
+    services:
+    
+        app.request_collector:
+            class: EnuygunCom\OpcacheClearBundle\Service\OpcacheDataCollector
+            tags:
+                -
+                    name:     data_collector
+                    template: 'EnuygunComOpcacheClearBundle:DataCollector:template.html.twig'
+                    id:       'app.request_collector'
+            public: false
